@@ -1,0 +1,52 @@
+---
+title: "Day-2 Supplemental Information"
+author: "Ji-Qing Chen"
+date: "2023-06-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{bash}
+FTP site for Gencode: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/
+Instructions for access data from gencode FTP site: https://www.gencodegenes.org/pages/data_access.html
+Genome annotation for eukaryotes: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/process/
+```
+
+a good exercise for understanding long bash commands like that is to run each part of them and observe how the output changes:
+1.) echo ENSEMBL_ID gene_name *.htseq-counts
+```{bash}
+ENSEMBL_ID gene_name SRR1039508.htseq-counts SRR1039509.htseq-counts SRR1039512.htseq-counts SRR1039513.htseq-counts
+```
+2.) echo ENSEMBL_ID gene_name *.htseq-counts| sed s/".htseq-counts"//g
+```{bash}
+ENSEMBL_ID gene_name SRR1039508 SRR1039509 SRR1039512 SRR1039513
+```
+3.) echo ENSEMBL_ID gene_name *.htseq-counts| sed s/".htseq-counts"//g| sed s/" "/"\t"/g
+```{bash}
+ENSEMBL_ID      gene_name       SRR1039508      SRR1039509      SRR1039512      SRR1039513
+```
+
+an older version of STAR (version 2.7.2b) is installed by default on the Discovery cluster.  Without the conda environment active, you can see that path and version here:
+```{bash}
+[sullivan@discovery7 ~]$ which STAR
+/dartfs-hpc/admin/local/bin/STAR
+[sullivan@discovery7 ~]$ STAR --version
+2.7.2b
+```
+With the conda environment active, this is the path and STAR version you will see:
+```{bash}
+(rnaseq1) [sullivan@discovery7 hg38_chr20_index]$ which STAR
+/dartfs-hpc/scratch/rnaseq1/envs/rnaseq1/bin/STAR
+(rnaseq1) [sullivan@discovery7 hg38_chr20_index]$ STAR --version
+2.7.10b
+```
+And the specific reason given for that error, about "genome type" not being found is because the parameter "genome type" was renamed in STAR's index files to "genomeType", starting in STAR version 2.7.4a.  So if an older version of STAR is run, it will search for "genome type" in its index parameters, but it won't find it, because now it's called something different.  That's why activating the conda environment, and thus running a newer version of STAR, fixed that particular error message.
+```{bash}
+(rnaseq1) [sullivan@discovery7 hg38_chr20_index]$ cat /dartfs-hpc/scratch/rnaseq1/refs/hg38_chr20_index/genomeParameters.txt
+versionGenome   2.7.4a
+genomeType      Full
+```
+
